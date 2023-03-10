@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Commands;
+﻿using Assets.Scripts.Network;
+using Assets.Scripts.Network.Commands;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -11,19 +12,10 @@ namespace Assets.Scripts
         [SerializeField]
         private float _speed;
 
-        private Rigidbody _rigidbody;
-
-
-        private void Start()
-        {
-            _rigidbody = GetComponent<Rigidbody>();
-
-            NetworkObjectsRepository.NetworkObjectById.Add(0, new NetworkObject(gameObject, 1));
-        }
-
         private void Update()
         {
-            // Check if owner
+            if (!ClientProfile.IsOwnerOfObject(gameObject))
+                return;
 
             var x = Input.GetAxis("Horizontal") * -_speed;
             var y = Input.GetAxis("Vertical") * -_speed;
@@ -32,7 +24,7 @@ namespace Assets.Scripts
             {
                 var moveCmd = new MoveCmd(0, x, y);
 
-                hub.PerformCommand(moveCmd);
+                GameBus.OnClientSendToServer?.Invoke(moveCmd);
             }
         }
     }

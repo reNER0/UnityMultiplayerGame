@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.Network
 {
     internal class NetworkClient
     {
+        public int ClientId;
         public TcpClient Client;
         public StreamReader StreamReader;
         public StreamWriter StreamWriter;

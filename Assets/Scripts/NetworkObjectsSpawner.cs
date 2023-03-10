@@ -1,4 +1,5 @@
-using Assets.Scripts.Commands;
+using Assets.Scripts.Network;
+using Assets.Scripts.Network.Commands;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,12 +20,6 @@ namespace Assets.Scripts
         {
             foreach (var networkObjectsByPosition in networkObjectsByPositionList)
             {
-                var cmd = new SpawnCmd(
-                    networkObjectsByPosition.NetworkObject.OwnerId,
-                    networkObjectsByPosition.NetworkObject.GameObject.name,
-                    networkObjectsByPosition.Transform.position,
-                    networkObjectsByPosition.Transform.rotation
-                    );
 
 
             }

@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Assets.Scripts.Commands
+namespace Assets.Scripts.Network.Commands
 {
     [Serializable]
-    public class MoveCmd : SerializableCommandClass, ICommand
+    public class MoveCmd : SerializableClass, ICommand
     {
         [SerializeField]
         private int _objectId;
