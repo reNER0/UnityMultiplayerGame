@@ -4,26 +4,41 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using UnityEngine;
+using Zenject;
 
 namespace Assets.Scripts.Network
 {
-    public class ClientHub : Hub
+    public interface IClientHub
     {
+        public void PerformCommand(ICommand cmd);
+        public void SendCommandToServer(ICommand cmd);
+    }
+    public class ClientHub : Hub, IClientHub, IInitializable, IDisposable
+    {
+        [SerializeField]
+        protected string _ip = "192.168.0.106";
+
         private static TcpClient _client;
         private static StreamReader _streamReader;
         private static StreamWriter _streamWriter;
 
-        private void Start()
+        public void Initialize()
         {
-#if UNITY_SERVER
-        //Destroy(this);
-#endif
-
             ConnectClient();
 
-            GameBus.OnClientSendToServer += SendCommandToServer;
+            NetworkBus.OnCommandSend += PerformCommand;
+            NetworkBus.OnCommandSend += SendCommandToServer;
         }
 
+        public void PerformCommand(ICommand cmd)
+        {
+            cmd.Execute();
+        }
+
+        public void SendCommandToServer(ICommand cmd)
+        {
+            _streamWriter.WriteLine(CommandToString(cmd));
+        }
 
         private async Task ConnectClient()
         {
@@ -46,8 +61,7 @@ namespace Assets.Scripts.Network
                 catch (Exception e)
                 {
                     Debug.LogError(e);
-
-                    await Task.Delay(3000);
+                    return;
                 }
             }
         }
@@ -85,14 +99,14 @@ namespace Assets.Scripts.Network
             }
         }
 
-        private void PerformCommand(ICommand cmd)
+        public void Dispose()
         {
-            cmd.Execute();
-        }
+            NetworkBus.OnCommandSend -= PerformCommand;
+            NetworkBus.OnCommandSend -= SendCommandToServer;
 
-        public void SendCommandToServer(ICommand cmd)
-        {
-            _streamWriter.WriteLine(CommandToString(cmd));
+            _client?.Dispose();
+            _streamReader?.Dispose();
+            _streamWriter?.Dispose();
         }
     }
 }

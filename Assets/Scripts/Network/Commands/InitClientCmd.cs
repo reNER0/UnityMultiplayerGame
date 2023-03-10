@@ -16,9 +16,7 @@ namespace Assets.Scripts.Network.Commands
 
         public void Execute()
         {
-            ClientProfile.SetClientId(_clientId);
-
-            Debug.Log(_clientId);
+            NetworkRepository.SetClientId(_clientId);
         }
     }
 }

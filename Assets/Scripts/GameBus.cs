@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts
 {
-    internal static class GameBus
+    public static class GameBus
     {
         public static Action OnGameStarted;
         public static Action<ICommand> OnClientSendToServer;

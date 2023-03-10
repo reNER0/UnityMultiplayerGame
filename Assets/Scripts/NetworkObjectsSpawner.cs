@@ -1,28 +1,53 @@
 using Assets.Scripts.Network;
 using Assets.Scripts.Network.Commands;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace Assets.Scripts
 {
     public class NetworkObjectsSpawner : MonoBehaviour
     {
         [SerializeField]
-        private List<NetworkObjectSpawnParameters> networkObjectsByPositionList;
+        private Transform[] _spawnPoints;
 
-        private void Start()
+        private IServerHub _serverHub;
+
+        // Delete this
+        private int currentSpawnPoint;
+
+
+        [Inject]
+        public void Construct(IServerHub serverHub)
         {
-            CreateNetworkObjects();
+            _serverHub = serverHub;
         }
 
-        private void CreateNetworkObjects()
+        private void Awake()
         {
-            foreach (var networkObjectsByPosition in networkObjectsByPositionList)
-            {
+#if !UNITY_SERVER
+            Destroy(this);
+#endif
 
+            NetworkBus.OnClientConnected += CreateNetworkObjects;
+        }
 
-            }
+        private void CreateNetworkObjects(NetworkClient client)
+        {
+            var spawnCmd = new SpawnCmd("Player", client.ClientId, _spawnPoints[currentSpawnPoint].position, _spawnPoints[currentSpawnPoint].rotation);
+
+            _serverHub.PerformCommand(spawnCmd);
+            _serverHub.SendCommandToAllClients(spawnCmd);
+
+            // Delete this
+            currentSpawnPoint++;
+            if (currentSpawnPoint >= _spawnPoints.Length)
+                currentSpawnPoint = 0;
+        }
+
+        private void OnDestroy()
+        {
+            NetworkBus.OnClientConnected -= CreateNetworkObjects;
         }
     }
 

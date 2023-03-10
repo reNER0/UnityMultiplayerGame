@@ -1,81 +1,49 @@
 using Assets.Scripts.Network.Commands;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using UnityEditor.PackageManager;
 using UnityEngine;
+using Zenject;
 
 namespace Assets.Scripts.Network
 {
-    public class ServerHub : Hub
+    public interface IServerHub
     {
-        private List<ICommand> _commandsHistory = new List<ICommand>();
+        public void PerformCommand(ICommand cmd);
+        public void SendCommandToClient(ICommand cmd, NetworkClient client);
+        public void SendCommandToAllClients(ICommand cmd);
+        public void SendCommandToAllClientsExcept(ICommand cmd, NetworkClient exceptClient);
+    }
 
-        private TcpListener _tcpListener;
-        private List<NetworkClient> _connectedClients = new List<NetworkClient>();
+    public class ServerHub : Hub, IServerHub, IInitializable
+    {
+        private readonly IServerRepository _serverRepository;
 
-        private void Start()
+        public ServerHub(IServerRepository serverRepository)
         {
-#if !UNITY_SERVER
-            //Destroy(this);
-#endif
+            _serverRepository = serverRepository;
+        }
 
-            ClientsConnectingTask();
-
-            GameBus.OnGameStarted += SpawnPlayers;
+        public void Initialize()
+        {
+            ConnectingClientsLoopTask();
         }
 
 
-        private void SpawnPlayers() 
+        private async Task ConnectingClientsLoopTask()
         {
-            var spawnCmd = new SpawnCmd("Player", 0);
-
-            SendCommandToClient(spawnCmd, _connectedClients.First());
-        }
-
-
-        private async Task ClientsConnectingTask()
-        {
-            _tcpListener = new TcpListener(IPAddress.Any, _port);
-            _tcpListener.Start();
+            var tcpListener = new TcpListener(IPAddress.Any, _port);
+            tcpListener.Start();
 
             while (true)
             {
                 try
                 {
-                    var client = await _tcpListener.AcceptTcpClientAsync();
+                    var client = await tcpListener.AcceptTcpClientAsync();
 
-                    var availableId = _connectedClients.Count;
-
-                    var connectedClient = new NetworkClient
-                    {
-                        ClientId = availableId,
-                        Client = client,
-                        StreamReader = new StreamReader(client.GetStream()),
-                        StreamWriter = new StreamWriter(client.GetStream()),
-                    };
-
-                    _connectedClients.Add(connectedClient);
-
-                    connectedClient.StreamWriter.AutoFlush = true;
-
-                    var initCmd = new InitClientCmd(availableId);
-
-                    connectedClient.StreamWriter.WriteLine(CommandToString(initCmd));
-
-                    ClientReadingTask(connectedClient);
-
-                    Debug.Log($"{client.Client.RemoteEndPoint} connected!");
-
-                    if (_connectedClients.Count < 1)
-                        continue;
-
-                    GameBus.OnGameStarted?.Invoke();
-                    return;
+                    AddNewClient(client);
                 }
                 catch (Exception e)
                 {
@@ -84,13 +52,45 @@ namespace Assets.Scripts.Network
             }
         }
 
+        private void AddNewClient(TcpClient client) 
+        {
+            var availableId = _serverRepository.GetClients().Length;
+
+            var connectedClient = new NetworkClient
+            {
+                ClientId = availableId,
+                Client = client,
+                StreamReader = new StreamReader(client.GetStream()),
+                StreamWriter = new StreamWriter(client.GetStream()),
+            };
+
+            connectedClient.StreamWriter.AutoFlush = true;
+
+            var initCmd = new InitClientCmd(availableId);
+
+            SendCommandToClient(initCmd, connectedClient);
+
+            foreach (var cmd in _serverRepository.GetCommands()) 
+            {
+                SendCommandToClient(cmd, connectedClient);
+            }
+
+            ClientReadingTask(connectedClient);
+
+            _serverRepository.AddClient(connectedClient);
+
+            Debug.Log($"{client.Client.RemoteEndPoint} connected!");
+            
+            NetworkBus.OnClientConnected?.Invoke(connectedClient);
+        }
+
         private async Task ClientReadingTask(NetworkClient client)
         {
             while (true)
             {
                 if (client.Client.Connected == false)
                 {
-                    _connectedClients.Remove(client);
+                    NetworkBus.OnClientDisconnected?.Invoke(client);
                     return;
                 }
 
@@ -99,6 +99,7 @@ namespace Assets.Scripts.Network
                 var cmd = StringToCommand(data);
 
                 PerformCommand(cmd);
+                SendCommandToAllClients(cmd);
             }
         }
 
@@ -108,12 +109,7 @@ namespace Assets.Scripts.Network
             {
                 cmd.Execute();
 
-                _commandsHistory.Add(cmd);
-
-                foreach (var client in _connectedClients)
-                {
-                    SendCommandToClient(cmd, client);
-                }
+                _serverRepository.AddCommandInCommandsTimeline(cmd);
             }
             catch (Exception e)
             {
@@ -121,9 +117,28 @@ namespace Assets.Scripts.Network
             }
         }
 
-        private void SendCommandToClient(ICommand cmd, NetworkClient client) 
+        public void SendCommandToClient(ICommand cmd, NetworkClient client)
         {
             client.StreamWriter.WriteLine(CommandToString(cmd));
+        }
+
+        public void SendCommandToAllClients(ICommand cmd)
+        {
+            foreach (var client in _serverRepository.GetClients())
+            {
+                SendCommandToClient(cmd, client);
+            }
+        }
+
+        public void SendCommandToAllClientsExcept(ICommand cmd, NetworkClient exceptClient)
+        {
+            foreach (var client in _serverRepository.GetClients())
+            {
+                if (client.ClientId == exceptClient.ClientId)
+                    continue;
+
+                SendCommandToClient(cmd, client);
+            }
         }
     }
 }

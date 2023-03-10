@@ -4,21 +4,18 @@ using UnityEngine;
 
 namespace Assets.Scripts.Network
 {
-    public class Hub : MonoBehaviour
+    public class Hub
     {
         [SerializeField]
-        protected string _ip;
-        [SerializeField]
-        protected int _port;
+        protected int _port = 3033;
 
 
-        protected static string CommandToString(ICommand cmd)
+        protected string CommandToString(ICommand cmd)
         {
-            var json = JsonUtility.ToJson(cmd);
-            return json;
+            return JsonUtility.ToJson(cmd);
         }
 
-        protected static ICommand StringToCommand(string msg)
+        protected ICommand StringToCommand(string msg)
         {
             SerializableClass ctype = JsonUtility.FromJson<SerializableClass>(msg);
             Type t = Type.GetType(ctype.ClassName);
