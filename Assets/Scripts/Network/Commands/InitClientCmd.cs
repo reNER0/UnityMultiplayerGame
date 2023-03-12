@@ -17,6 +17,7 @@ namespace Assets.Scripts.Network.Commands
         public void Execute()
         {
             NetworkRepository.SetClientId(_clientId);
+            Debug.Log($"Init cmd: {_clientId}");
         }
     }
 }

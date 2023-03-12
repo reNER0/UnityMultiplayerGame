@@ -15,9 +15,6 @@ namespace Assets.Scripts.Network
     }
     public class ClientHub : Hub, IClientHub, IInitializable, IDisposable
     {
-        [SerializeField]
-        protected string _ip = "192.168.0.106";
-
         private static TcpClient _client;
         private static StreamReader _streamReader;
         private static StreamWriter _streamWriter;
@@ -48,7 +45,7 @@ namespace Assets.Scripts.Network
                 {
                     _client = new TcpClient();
 
-                    await _client.ConnectAsync(_ip, _port);
+                    await _client.ConnectAsync(NetworkSettings.ServerIP, _port);
 
                     _streamReader = new StreamReader(_client.GetStream());
                     _streamWriter = new StreamWriter(_client.GetStream());

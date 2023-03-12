@@ -1,6 +1,7 @@
 using Assets.Scripts.Network.Commands;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -15,9 +16,11 @@ namespace Assets.Scripts.Network
         public void SendCommandToClient(ICommand cmd, NetworkClient client);
         public void SendCommandToAllClients(ICommand cmd);
         public void SendCommandToAllClientsExcept(ICommand cmd, NetworkClient exceptClient);
+        public void DisconnectClient(NetworkClient client);
+        public void DisconnectAllClients();
     }
 
-    public class ServerHub : Hub, IServerHub, IInitializable
+    public class ServerHub : Hub, IServerHub, IInitializable, IDisposable
     {
         private readonly IServerRepository _serverRepository;
 
@@ -29,6 +32,8 @@ namespace Assets.Scripts.Network
         public void Initialize()
         {
             ConnectingClientsLoopTask();
+
+            NetworkBus.OnCommandSendToClients += SendCommandToAllClients;
         }
 
 
@@ -70,7 +75,7 @@ namespace Assets.Scripts.Network
 
             SendCommandToClient(initCmd, connectedClient);
 
-            foreach (var cmd in _serverRepository.GetCommands()) 
+            foreach (var cmd in _serverRepository.GetCommands().Where(x => x.GetType().Equals(typeof(SpawnCmd)))) 
             {
                 SendCommandToClient(cmd, connectedClient);
             }
@@ -99,7 +104,7 @@ namespace Assets.Scripts.Network
                 var cmd = StringToCommand(data);
 
                 PerformCommand(cmd);
-                SendCommandToAllClients(cmd);
+                //SendCommandToAllClients(cmd);
             }
         }
 
@@ -139,6 +144,26 @@ namespace Assets.Scripts.Network
 
                 SendCommandToClient(cmd, client);
             }
+        }
+
+        public void DisconnectClient(NetworkClient client)
+        {
+            client.Client.Close();
+        }
+
+        public void DisconnectAllClients()
+        {
+            foreach (var client in _serverRepository.GetClients())
+            {
+                DisconnectClient(client);
+            }
+        }
+
+        public void Dispose()
+        {
+            DisconnectAllClients();
+
+            NetworkBus.OnCommandSendToClients -= SendCommandToAllClients;
         }
     }
 }

@@ -23,13 +23,11 @@ namespace Assets.Scripts.Network.Commands
 
         public void Execute()
         {
-            var gameObject = NetworkRepository.NetworkObjectById[_objectId];
+            var gameObject = NetworkRepository.NetworkObjectById[_objectId].GameObject;
 
-            var rigidbody = gameObject.GameObject.GetComponent<Rigidbody>();
+            var moveVector = new Vector3(_x, 0, _y);
 
-            var force = new Vector3(_x, 0, _y);
-
-            rigidbody.AddForce(force, ForceMode.Impulse);
+            gameObject.transform.position += moveVector;
         }
     }
 }
