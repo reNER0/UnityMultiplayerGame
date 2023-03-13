@@ -23,8 +23,8 @@ namespace Assets.Scripts.Network
         {
             ConnectClient();
 
-            NetworkBus.OnCommandSend += PerformCommand;
-            NetworkBus.OnCommandSend += SendCommandToServer;
+            NetworkBus.OnCommandSendToServer += PerformCommand;
+            NetworkBus.OnCommandSendToServer += SendCommandToServer;
         }
 
         public void PerformCommand(ICommand cmd)
@@ -84,8 +84,6 @@ namespace Assets.Scripts.Network
                         Debug.LogError("Client disconnected!");
                         return;
                     }
-
-                    await Task.Delay(10);
                 }
                 catch (Exception e)
                 {
@@ -98,8 +96,8 @@ namespace Assets.Scripts.Network
 
         public void Dispose()
         {
-            NetworkBus.OnCommandSend -= PerformCommand;
-            NetworkBus.OnCommandSend -= SendCommandToServer;
+            NetworkBus.OnCommandSendToServer -= PerformCommand;
+            NetworkBus.OnCommandSendToServer -= SendCommandToServer;
 
             _client?.Dispose();
             _streamReader?.Dispose();

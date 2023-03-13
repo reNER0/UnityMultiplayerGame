@@ -104,7 +104,7 @@ namespace Assets.Scripts.Network
                 var cmd = StringToCommand(data);
 
                 PerformCommand(cmd);
-                //SendCommandToAllClients(cmd);
+                SendCommandToAllClients(cmd);
             }
         }
 

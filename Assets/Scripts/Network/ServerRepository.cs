@@ -77,5 +77,6 @@ namespace Assets.Scripts.Network
         public TcpClient Client;
         public StreamReader StreamReader;
         public StreamWriter StreamWriter;
+        public PlayerInputs PlayerInputs;
     }
 }

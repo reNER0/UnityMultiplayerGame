@@ -6,7 +6,7 @@ using Zenject;
 
 namespace Assets.Scripts
 {
-    public class PositionSync : MonoBehaviour
+    public class TransformSync : MonoBehaviour
     {
         private void Start()
         {
@@ -25,7 +25,7 @@ namespace Assets.Scripts
 
                 NetworkBus.OnCommandSendToClients?.Invoke(syncCmd);
 
-                await Task.Delay(1000 / NetworkSettings.ServerTickrate);
+                await Task.Delay(NetworkSettings.ServerFixedUpdateTimeMilliseconds);
             }
         }
     }

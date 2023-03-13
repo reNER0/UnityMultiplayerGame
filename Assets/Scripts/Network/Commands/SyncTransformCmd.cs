@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using DG.Tweening;
 
 namespace Assets.Scripts.Network.Commands
 {
@@ -24,10 +25,9 @@ namespace Assets.Scripts.Network.Commands
         {
             var gameObject = NetworkRepository.NetworkObjectById[_objectId].GameObject;
 
-            gameObject.transform.position = _position;
-            gameObject.transform.rotation = _rotation;
-
-            Debug.LogError("Sync" + _position);
+            gameObject.transform.DOKill();
+            gameObject.transform.DOMove(_position, NetworkSettings.ServerFixedUpdateTime / 2);
+            gameObject.transform.DORotateQuaternion(_rotation, NetworkSettings.ServerFixedUpdateTime / 2);
         }
     }
 }

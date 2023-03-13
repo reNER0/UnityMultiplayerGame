@@ -1,11 +1,11 @@
-﻿using System;
+﻿using DG.Tweening.Core.Easing;
+using System;
 using UnityEngine;
-using Zenject;
 
 namespace Assets.Scripts.Network.Commands
 {
     [Serializable]
-    public class MoveCmd : SerializableClass, ICommand
+    public class InputCmd : SerializableClass, ICommand
     {
         [SerializeField]
         private int _objectId;
@@ -14,7 +14,7 @@ namespace Assets.Scripts.Network.Commands
         [SerializeField]
         private float _y;
 
-        public MoveCmd(int objectId, float x, float y)
+        public InputCmd(int objectId, float x, float y)
         {
             _objectId = objectId;
             _x = x;
@@ -23,11 +23,10 @@ namespace Assets.Scripts.Network.Commands
 
         public void Execute()
         {
-            var gameObject = NetworkRepository.NetworkObjectById[_objectId].GameObject;
+            var input = NetworkRepository.NetworkObjectById[_objectId].GameObject.GetComponent<PlayerInput>();
 
-            var moveVector = new Vector3(_x, 0, _y);
-
-            gameObject.transform.position += moveVector;
+            input.X = _x;
+            input.Y = _y;
         }
     }
 }
