@@ -5,6 +5,7 @@ namespace Assets.Scripts.Network
 {
     public static class NetworkBus 
     {
+        public static Action OnGameReadyChecked;
         public static Action<ICommand> OnCommandSendToServer;
         public static Action<ICommand> OnCommandSendToClients;
         public static Action<NetworkClient> OnClientConnected;

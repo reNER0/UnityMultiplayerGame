@@ -259,6 +259,7 @@ GameObject:
   - component: {fileID: 854204641}
   - component: {fileID: 854204640}
   - component: {fileID: 854204639}
+  - component: {fileID: 854204642}
   m_Layer: 0
   m_Name: SceneContext
   m_TagString: Untagged
@@ -293,6 +294,7 @@ MonoBehaviour:
   _scriptableObjectInstallers: []
   _monoInstallers:
   - {fileID: 854204639}
+  - {fileID: 854204642}
   _installerPrefabs: []
   _autoRun: 1
   OnPreInstall:
@@ -325,6 +327,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &854204642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 854204638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f855d0cab3d21ff4f937fab142322b10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -418,7 +432,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1383801164}
-  - component: {fileID: 1383801163}
   m_Layer: 0
   m_Name: NetworkObjectsSpawner
   m_TagString: Untagged
@@ -426,21 +439,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1383801163
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1383801162}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66a5ef334a1a070418b70185e51d23e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spawnPoints:
-  - {fileID: 1429985471}
-  - {fileID: 264803381}
 --- !u!4 &1383801164
 Transform:
   m_ObjectHideFlags: 0
