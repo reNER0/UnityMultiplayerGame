@@ -14,6 +14,8 @@ namespace Assets.Scripts.Network
 
         public static int GetGameObjectsId(GameObject gameObject) => NetworkObjectById.First(x => x.Value.GameObject == gameObject).Key;
 
+        public static NetworkObject GetNetworkObject(GameObject gameObject) => NetworkObjectById.First(x => x.Value.GameObject == gameObject).Value;
+
         public static void SetClientId(int id)
         {
             CurrentCliendId = id;

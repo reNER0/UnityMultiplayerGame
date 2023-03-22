@@ -32,8 +32,8 @@ namespace Assets.Scripts.Game
 
         private void CreateNetworkObjects(NetworkClient client)
         {
-            // TODO : Setup spawn positions
-            var spawnCmd = new SpawnCmd("Player", client.ClientId, Vector3.up * 3, Quaternion.identity);
+            var spawnTransform = _stateMachine.SpawnPoints.PlayerSpawnPoints[client.ClientId];
+            var spawnCmd = new SpawnCmd("Player", client.ClientId, spawnTransform.position, spawnTransform.rotation);
 
             _stateMachine.ServerHub?.PerformCommand(spawnCmd);
             _stateMachine.ServerHub?.SendCommandToAllClients(spawnCmd);

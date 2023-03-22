@@ -13,18 +13,21 @@ namespace Assets.Scripts.Game
     {
         private readonly IServerHub _serverHub;
         private readonly IServerRepository _serverRepository;
+        private readonly SpawnPoints _spawnPoints;
 
         private GameState _gameState = new WaitingForPlayersState(2);
 
 
         public IServerHub ServerHub => _serverHub;
         public IServerRepository ServerRepository => _serverRepository;
+        public SpawnPoints SpawnPoints => _spawnPoints;
 
 #if UNITY_SERVER
-        public GameStateMachine(IServerHub serverHub, IServerRepository serverRepository) 
+        public GameStateMachine(IServerHub serverHub, IServerRepository serverRepository, SpawnPoints spawnPoints) 
         {
             _serverHub = serverHub;
             _serverRepository = serverRepository;
+            _spawnPoints = spawnPoints;
         }
 #endif
 
