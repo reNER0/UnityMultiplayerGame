@@ -37,7 +37,8 @@ namespace Assets.Scripts.Game
                     spawnTransform.position, 
                     spawnTransform.rotation,
                     Vector3.zero,
-                    Vector3.zero
+                    Vector3.zero,
+                    NetworkSettings.CurrentTick
                     );
 
                 _stateMachine.ServerHub?.PerformCommand(moveCmd);

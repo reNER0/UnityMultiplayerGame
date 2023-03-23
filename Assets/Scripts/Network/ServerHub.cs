@@ -71,7 +71,10 @@ namespace Assets.Scripts.Network
 
             connectedClient.StreamWriter.AutoFlush = true;
 
-            var initCmd = new InitClientCmd(availableId);
+            const string FMT = "O";
+            DateTime now1 = NetworkSettings.ServerStartupTime;
+            string strDate = now1.ToString(FMT);
+            var initCmd = new InitClientCmd(availableId, strDate);
 
             SendCommandToClient(initCmd, connectedClient);
 

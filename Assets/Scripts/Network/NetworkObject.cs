@@ -7,7 +7,7 @@ namespace Assets.Scripts.Network
     public class NetworkObject
     {
         public GameObject GameObject;
-        public Rigidbody Rigidbody;
+        public RigidbodySync RigidbodySync;
         public int OwnerId;
 
         public NetworkObject(GameObject gameObject, int ownerId)
@@ -15,7 +15,7 @@ namespace Assets.Scripts.Network
             this.GameObject = gameObject;
             this.OwnerId = ownerId;
 
-            Rigidbody = gameObject.GetComponent<Rigidbody>();
+            RigidbodySync = gameObject.GetComponent<RigidbodySync>();
         }
     }
 }
